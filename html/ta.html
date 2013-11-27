@@ -40,13 +40,38 @@
 
 				    for (var index in myPage.trips) {
 				        //console.debug("trip: " + index + " " + myPage.trips[index].destination);
-				        id_logger_window = "lowell";
-            	        existingVal = $('#' + id_logger_window).val();
-                        $('#' + id_logger_window).val(existingVal + '\n' + "trip: " + index + " " + myPage.trips[index].destination);
+
+        				var newTrip = document.createElement("div");
+        				id = "trip_" + index;
+        				newTrip.setAttribute("id", id);
+        				newTrip.setAttribute("class", "trip");
+        				document.getElementById("trips").appendChild(newTrip);
+
+        				newTripTitle = document.createElement("h3");
+        				newTripTitle.setAttribute("id", id + "_title");
+        				newTripTitle.setAttribute("class", "tripTitle");
+        				newTripTitle.innerText = myPage.trips[index].destination + " trip " + index;
+                        newTrip.appendChild(newTripTitle);
+
+                        stopList = document.createElement("ul");
+                        stopList.setAttribute("class", "stoplist");
+                        newTrip.appendChild(stopList);
+
+				        //id_logger_window = "lowell";
+            	        //existingVal = $('#' + id_logger_window).val();
+
+                        //$('#' + id_logger_window).val(existingVal + '\n' + "trip: " + index + " " + myPage.trips[index].destination);
 				        for (var stop in myPage.trips[index].stops) {
 				            //console.debug("  stop: " + myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled);
-                            existingVal = $('#' + id_logger_window).val();
-                            $('#' + id_logger_window).val(existingVal + '\n' +   "  stop: " + myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled);
+
+                            newStop = document.createElement("li");
+                            newStop.setAttribute("class", "stop");
+                            newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled;
+
+                            stopList.appendChild(newStop);
+
+                            //existingVal = $('#' + id_logger_window).val();
+                            //$('#' + id_logger_window).val(existingVal + '\n' +   "  stop: " + myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled);
 				        }
 				    }
 				}
@@ -62,12 +87,25 @@
 
     </script>
     <div>
-        <h1>Hydrogen Logs</h1>
+        <h1>MBTA Commuter Rail</h1>
+        <div id="trips">
+            <div id="trip_nnn">
+                <h3>Trip 232 to North Station</h3>
+                <ul>
+                    <li>
+                        West Medford scheduled for 3:45
+                    </li>
+                    <li>
+                        Wedgemere scheduled for 3:50
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div id="loggerWindows">
-            <div class="loggerWindow">
+            <!--div class="loggerWindow">
                 <h2>Lowell</h2>
                 <textarea id="lowell" rows="100" cols="70" readonly class="loggerData"></textarea>
-            </div>
+            </div-->
 
         </div>
 
