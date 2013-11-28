@@ -20,6 +20,12 @@
             format_page();
         }
 
+        // triggered when departureboard data received
+        function grab_departureboard(response) {
+            departures_data = response;
+            format_page();
+        }
+
         // format the page with all the nice data we've gathered
         function format_page() {
 
@@ -37,6 +43,7 @@
                     myPage.trips[trip] = new Object()
                     myPage.trips[trip].destination = messages[i].Destination
                     myPage.trips[trip].vehicle = messages[i].Vehicle
+                    myPage.trips[trip].track = getTrack(trip);
                     myPage.trips[trip].stops = new Array()
                 }
 
@@ -58,7 +65,7 @@
                 newTripTitle = document.createElement("h3");
                 newTripTitle.setAttribute("id", id + "_title");
                 newTripTitle.setAttribute("class", "tripTitle");
-                newTripTitle.innerText = myPage.trips[index].destination + " trip " + index + ", Vehicle #" + myPage.trips[index].vehicle;
+                newTripTitle.innerText = myPage.trips[index].destination + " trip " + index + ", Vehicle #" + myPage.trips[index].vehicle + ", track #" + myPage.trips[index].track;
                 newTrip.appendChild(newTripTitle);
 
                 stopList = document.createElement("ul");
@@ -91,9 +98,13 @@
             }
         }
 
-        function grab_departureboard(response) {
-            departures_data = response;
-            format_page();
+        function getTrack(trip) {
+            for (var i=1; i<departures_data.query.results.row.length; i++) {
+                if (departures_data.query.results.row[i].col2 == trip) {
+                    return departures_data.query.results.row[i].col5;
+                }
+            }
+            return "";
         }
 
     </script>
