@@ -11,80 +11,79 @@
 
     <script type="text/javascript">
 
-   				function grab(response) {
-				    var messages = response.query.results.json.Messages;
-				    var myPage = new Object();
-				    myPage.trips = {}
+        function grab_schedule(response) {
+            var messages = response.query.results.json.Messages;
+            var myPage = new Object();
+            myPage.trips = {}
 
-				    for (var i=0; i<messages.length; i++) {
-				        var trip = messages[i].Trip;
-				        if (!(trip in myPage.trips)) {
-				            myPage.trips[trip] = new Object()
-				            myPage.trips[trip].destination = messages[i].Destination
-				            myPage.trips[trip].vehicle = messages[i].Vehicle
-				            myPage.trips[trip].stops = new Array()
-				        }
+            for (var i=0; i<messages.length; i++) {
+                var trip = messages[i].Trip;
+                if (!(trip in myPage.trips)) {
+                    myPage.trips[trip] = new Object()
+                    myPage.trips[trip].destination = messages[i].Destination
+                    myPage.trips[trip].vehicle = messages[i].Vehicle
+                    myPage.trips[trip].stops = new Array()
+                }
 
-                        nextIndex = myPage.trips[trip].stops.length
-				        myPage.trips[trip].stops[nextIndex] = new Object();
-				        myPage.trips[trip].stops[nextIndex].name = messages[i].Stop;
-				        myPage.trips[trip].stops[nextIndex].scheduled = new Date(messages[i].Scheduled*1000)
-				    }
+                nextIndex = myPage.trips[trip].stops.length
+                myPage.trips[trip].stops[nextIndex] = new Object();
+                myPage.trips[trip].stops[nextIndex].name = messages[i].Stop;
+                myPage.trips[trip].stops[nextIndex].scheduled = new Date(messages[i].Scheduled*1000)
+            }
 
-				    for (var index in myPage.trips) {
-				        //console.debug("trip: " + index + " " + myPage.trips[index].destination);
+            for (var index in myPage.trips) {
+                //console.debug("trip: " + index + " " + myPage.trips[index].destination);
 
-        				var newTrip = document.createElement("div");
-        				id = "trip_" + index;
-        				newTrip.setAttribute("id", id);
-        				newTrip.setAttribute("class", "trip");
-        				document.getElementById("trips").appendChild(newTrip);
+                var newTrip = document.createElement("div");
+                id = "trip_" + index;
+                newTrip.setAttribute("id", id);
+                newTrip.setAttribute("class", "trip");
+                document.getElementById("trips").appendChild(newTrip);
 
-        				newTripTitle = document.createElement("h3");
-        				newTripTitle.setAttribute("id", id + "_title");
-        				newTripTitle.setAttribute("class", "tripTitle");
-        				newTripTitle.innerText = myPage.trips[index].destination + " trip " + index + ", Vehicle #" + myPage.trips[index].vehicle;
-                        newTrip.appendChild(newTripTitle);
+                newTripTitle = document.createElement("h3");
+                newTripTitle.setAttribute("id", id + "_title");
+                newTripTitle.setAttribute("class", "tripTitle");
+                newTripTitle.innerText = myPage.trips[index].destination + " trip " + index + ", Vehicle #" + myPage.trips[index].vehicle;
+                newTrip.appendChild(newTripTitle);
 
-                        stopList = document.createElement("ul");
-                        stopList.setAttribute("class", "stoplist");
-                        newTrip.appendChild(stopList);
+                stopList = document.createElement("ul");
+                stopList.setAttribute("class", "stoplist");
+                newTrip.appendChild(stopList);
 
-				        //id_logger_window = "lowell";
-            	        //existingVal = $('#' + id_logger_window).val();
+                for (var stop in myPage.trips[index].stops) {
 
-                        //$('#' + id_logger_window).val(existingVal + '\n' + "trip: " + index + " " + myPage.trips[index].destination);
-				        for (var stop in myPage.trips[index].stops) {
-				            //console.debug("  stop: " + myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled);
+                    newStop = document.createElement("li");
+                    newStop.setAttribute("class", "stop");
 
-                            newStop = document.createElement("li");
-                            newStop.setAttribute("class", "stop");
+                    // format the time
+                    stime = myPage.trips[index].stops[stop].scheduled;
 
-                            // format the time
-                            stime = myPage.trips[index].stops[stop].scheduled;
+                    min = stime.getMinutes()
+                    if (min < 10) {
+                        min = "0" + min
+                    }
 
-                            min = stime.getMinutes()
-                            if (min < 10) {
-                                min = "0" + min
-                            }
+                    hours = stime.getHours() % 12
 
-                            hours = stime.getHours() % 12
+                    var ampm = "pm";
+                    if (stime.getHours() < 12) { ampm = "am"; }
 
-                            var ampm = "pm";
-                            if (stime.getHours() < 12) { ampm = "am"; }
+                    st = hours + ":" + min + " " + ampm
+                    newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + st;
 
-                            st = hours + ":" + min + " " + ampm
-                            newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + st;
+                    stopList.appendChild(newStop);
+                }
+            }
+        }
 
-                            stopList.appendChild(newStop);
-
-                            //existingVal = $('#' + id_logger_window).val();
-                            //$('#' + id_logger_window).val(existingVal + '\n' +   "  stop: " + myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled);
-				        }
-				    }
-				}
+        function grab_departureboard(response) {
+            console.debug("grab_departureboard");
+        }
+        
     </script>
+
 </head>
+
 <body>
 
 	<script type="text/template" id="loggerWindowTemplate">
@@ -92,7 +91,6 @@
             <h2>{0}</h2>
             <textarea id="{1}" rows="10" cols="200" readonly class="loggerData"></textarea>
         </div>
-
     </script>
 
     <div>
@@ -102,44 +100,21 @@
         </div>
     </div>
 
-     <div id="loggerWindows">
-        <!--div class="loggerWindow">
-            <h2>Lowell</h2>
-            <textarea id="lowell" rows="100" cols="70" readonly class="loggerData"></textarea>
-        </div-->
-     </div>
-  <script language="javascript" type="text/javascript">
-
-
-    String.prototype.format = function() {
-      var args = arguments;
-      return this.replace(/{(\d+)}/g, function(match, number) {
-        return typeof args[number] != 'undefined'
-          ? args[number]
-          : match
-        ;
-      });
-    };
-
-    function addLoggerWindow(title, log_output_id) {
-        var loggerTemplate = $("#loggerWindowTemplate").html();
-        var logtemplate = loggerTemplate.format(title, log_output_id);
-        $("#loggerWindows").append(logtemplate);
-    }
-
-
-    //jsondata='{"Messages":[{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"Wilmington","Scheduled":"1385577720","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"Anderson\/ Woburn","Scheduled":"1385578080","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"Winchester Center","Scheduled":"1385578500","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"Wedgemere","Scheduled":"1385578620","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"West Medford","Scheduled":"1385578860","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"222","Destination":"North Station","Stop":"North Station","Scheduled":"1385579520","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"North Station","Scheduled":"1385575800","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"West Medford","Scheduled":"1385576520","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"Wedgemere","Scheduled":"1385576760","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"Winchester Center","Scheduled":"1385576880","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"Anderson\/ Woburn","Scheduled":"1385577300","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"Wilmington","Scheduled":"1385577540","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"North Billerica","Scheduled":"1385578020","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"321","Destination":"Lowell","Stop":"Lowell","Scheduled":"1385578440","Flag":"sch","Vehicle":"1647","Latitude":"42.36728","Longitude":"-71.06351","Heading":"318","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"Lowell","Scheduled":"1385576100","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"North Billerica","Scheduled":"1385576580","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"Wilmington","Scheduled":"1385577060","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"Anderson\/ Woburn","Scheduled":"1385577300","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"Winchester Center","Scheduled":"1385577720","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"Wedgemere","Scheduled":"1385577840","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"West Medford","Scheduled":"1385578080","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"322","Destination":"North Station","Stop":"North Station","Scheduled":"1385578740","Flag":"sch","Vehicle":"1645","Latitude":"42.63504","Longitude":"-71.31432","Heading":"335","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"319","Destination":"Lowell","Stop":"Lowell","Scheduled":"1385574840","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""},{"TimeStamp":"1385575102","Trip":"320","Destination":"North Station","Stop":"North Station","Scheduled":"1385575140","Flag":"sch","Vehicle":"","Latitude":"","Longitude":"","Heading":"","Speed":"","Lateness":""}],"UpdateDate":"\/Date(1385575108033-0500)\/"}'
-
-	</script>
+    <div id="jsonp_script_parent"></div>
 
     <script language="javascript" type="text/javascript">
+
           function init() {
 
+                // setup jsonp yahoo bouncer for train schedule feed
 				var script = document.createElement("script");
-				//script.setAttribute("type", "text/javascript")
-				script.src = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22http%3A%2F%2Fdeveloper.mbta.com%2Flib%2FRTCR%2FRailLine_10.json%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=grab';
+				script.src = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22http%3A%2F%2Fdeveloper.mbta.com%2Flib%2FRTCR%2FRailLine_10.json%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=grab_schedule';
+				document.getElementById("jsonp_script_parent").appendChild(script);
 
-				document.getElementById("loggerWindows").appendChild(script);
+				// setup jsonp yahoo bouncer for departure board feed
+				var script2 = document.createElement("script");
+				script2.src = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%22http%3A%2F%2fdeveloper.mbta.com%2Flib%2Fgtrtfs%2FDepartures.csv%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=grab_departureboard';
+				document.getElementById("jsonp_script_parent").appendChild(script2);
           }
 
           window.addEventListener("load", init, false);
