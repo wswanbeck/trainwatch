@@ -11,8 +11,23 @@
 
     <script type="text/javascript">
 
+        var schedule_data = null;
+        var departures_data = null;
+
+        // triggered when we have jsonp with schedule data
         function grab_schedule(response) {
-            var messages = response.query.results.json.Messages;
+            schedule_data = response;
+            format_page();
+        }
+
+        // format the page with all the nice data we've gathered
+        function format_page() {
+
+            // run this only after both departures_data and schedule_data has been received
+            if ((schedule_data == null) || (departures_data == null)) {
+                return;
+            }
+            var messages = schedule_data.query.results.json.Messages;
             var myPage = new Object();
             myPage.trips = {}
 
@@ -77,9 +92,10 @@
         }
 
         function grab_departureboard(response) {
-            console.debug("grab_departureboard");
+            departures_data = response;
+            format_page();
         }
-        
+
     </script>
 
 </head>
