@@ -21,6 +21,7 @@
 				        if (!(trip in myPage.trips)) {
 				            myPage.trips[trip] = new Object()
 				            myPage.trips[trip].destination = messages[i].Destination
+				            myPage.trips[trip].vehicle = messages[i].Vehicle
 				            myPage.trips[trip].stops = new Array()
 				        }
 
@@ -42,7 +43,7 @@
         				newTripTitle = document.createElement("h3");
         				newTripTitle.setAttribute("id", id + "_title");
         				newTripTitle.setAttribute("class", "tripTitle");
-        				newTripTitle.innerText = myPage.trips[index].destination + " trip " + index;
+        				newTripTitle.innerText = myPage.trips[index].destination + " trip " + index + ", Vehicle #" + myPage.trips[index].vehicle;
                         newTrip.appendChild(newTripTitle);
 
                         stopList = document.createElement("ul");
@@ -58,7 +59,22 @@
 
                             newStop = document.createElement("li");
                             newStop.setAttribute("class", "stop");
-                            newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + myPage.trips[index].stops[stop].scheduled;
+
+                            // format the time
+                            stime = myPage.trips[index].stops[stop].scheduled;
+
+                            min = stime.getMinutes()
+                            if (min < 10) {
+                                min = "0" + min
+                            }
+
+                            hours = stime.getHours() % 12
+
+                            var ampm = "pm";
+                            if (stime.getHours() < 12) { ampm = "am"; }
+
+                            st = hours + ":" + min + " " + ampm
+                            newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + st;
 
                             stopList.appendChild(newStop);
 
