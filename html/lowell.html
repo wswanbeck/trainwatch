@@ -6,14 +6,37 @@
 	<title>MBTA Train Status</title>
 	<meta name="author" content="Wendy">
     <style type="text/css">
-        .vehicle {
+            .vehicle {
             font-weight:normal;
             margin: 2px;
+
+            border-width: 1px;
+            border-color: rgb(177, 164, 164);
+            border-style: solid;
+            padding-left: .2em;
+            padding-right: .2em;
         }
 
         .track {
             font-weight: normal;
             margin: 2px;
+
+            border-width: 1px;
+            border-color: rgb(177, 164, 164);
+            border-style: solid;
+            padding-left: .2em;
+            padding-right: .2em;
+        }
+
+        .tripnumber {
+            font-weight: normal;
+            margin: 2px;
+
+            border-width: 1px;
+            border-color: rgb(177, 164, 164);
+            border-style: solid;
+            padding-left: .2em;
+            padding-right: .2em;
         }
     </style>
 
@@ -79,16 +102,22 @@
                 dest.innerText = myPage.trips[index].destination;
                 newTripTitle.appendChild(dest);
 
+                tripnumber = document.createElement("span");
+                tripnumber.setAttribute("class", "tripnumber")
+                tripnumber.innerText =  "Trip #" + index;
+                newTripTitle.appendChild(tripnumber);
+
                 vehicle = document.createElement("span");
                 vehicle.setAttribute("class", "vehicle")
                 vehicle.innerText =  "Vehicle #" + myPage.trips[index].vehicle;
                 newTripTitle.appendChild(vehicle);
 
-                track = document.createElement("span");
-                track.setAttribute("class", "track");
-                track.innerText = "Track #" + myPage.trips[index].track;
-                newTripTitle.appendChild(track);
-
+                if ((myPage.trips[index].track != null) && (myPage.trips[index].track != "")) {
+                    track = document.createElement("span");
+                    track.setAttribute("class", "track");
+                    track.innerText = "Track #" + myPage.trips[index].track;
+                    newTripTitle.appendChild(track);
+                }
                 newTrip.appendChild(newTripTitle);
 
                 stopList = document.createElement("ul");
@@ -124,7 +153,7 @@
         function getTrack(trip) {
             for (var i=1; i<departures_data.query.results.row.length; i++) {
                 if (departures_data.query.results.row[i].col2 == trip) {
-                    return departures_data.query.results.row[i].col5;
+                    return departures_data.query.results.row[i].col6;
                 }
             }
             return "";
