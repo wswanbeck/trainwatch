@@ -11,44 +11,53 @@
             padding-right: .2em;
         }
 
-        .vehicle {
-            font-weight:normal;
-            margin: 2px;
+		.departuretime {
+			display: none;
+		}
+		
+		.trip {
+		    border-color: gray;
+		    border-width: 1px;
+		    border-bottom-width: 3px;
+		    border-style: solid;
+		    border-right-width: 3px;
+		    margin: .5em;
+		    /* float: left; */
+		}
+		
+		.tripTitle {
+			background-color: lightgray;
+			margin: 0px;
+		}
+		
 
-            border-width: 1px;
-            border-color: rgb(177, 164, 164);
-            border-style: solid;
-            padding-left: .2em;
-            padding-right: .2em;
+        .vehicle {
+			font-weight: normal;
+			margin: 2px;
+			margin-left: .7em;
+			font-size: smaller;
         }
 
         .track {
             font-weight: normal;
             margin: 2px;
-
-            border-width: 1px;
-            border-color: rgb(177, 164, 164);
-            border-style: solid;
-            padding-left: .2em;
-            padding-right: .2em;
         }
 
-        .tripnumber {
-            font-weight: normal;
-            margin: 2px;
+		.tripnumber {
+			font-weight: normal;
+			margin: 2px;
+			margin-left: .7em;
+			font-size: smaller;
+		}
 
-            border-width: 1px;
-            border-color: rgb(177, 164, 164);
-            border-style: solid;
-            padding-left: .2em;
-            padding-right: .2em;
-        }
     </style>
 
     <script type="text/javascript">
 
         var schedule_data = null;
         var departures_data = null;
+		var myPage = new Object();
+        myPage.trips = {};
 
         // triggered when we have jsonp with schedule data
         function grab_schedule(response) {
@@ -69,9 +78,8 @@
             if ((schedule_data == null) || (departures_data == null)) {
                 return;
             }
+
             var messages = schedule_data.query.results.json.Messages;
-            var myPage = new Object();
-            myPage.trips = {}
 
             for (var i=0; i<messages.length; i++) {
                 var trip = messages[i].Trip;
@@ -97,11 +105,22 @@
                 newTrip.setAttribute("id", id);
                 newTrip.setAttribute("class", "trip");
                 document.getElementById("trips").appendChild(newTrip);
-
+				
+				// <h3> ... </h3>
                 newTripTitle = document.createElement("h3");
                 newTripTitle.setAttribute("id", id + "_title");
                 newTripTitle.setAttribute("class", "tripTitle");
 
+				// <span ..> 9:15 to: </span>  - if we have departure time
+				departure_time = getDepartureTime(index);
+				if (departure_time != "") {
+					dep_time_element = document.createElement("span");
+					dep_time_element.setAttribute("class", "departuretime");
+					dep_time_element.innerText = formatTime(departure_time) + " to ";
+					newTripTitle.appendChild(dep_time_element);
+				} 
+
+				// <span ..> Lowell </span>
                 dest = document.createElement("span");
                 dest.setAttribute("class", "destination");
                 dest.innerText = myPage.trips[index].destination;
@@ -136,24 +155,27 @@
 
                     // format the time
                     stime = myPage.trips[index].stops[stop].scheduled;
-
-                    min = stime.getMinutes()
-                    if (min < 10) {
-                        min = "0" + min
-                    }
-
-                    hours = stime.getHours() % 12
-
-                    var ampm = "pm";
-                    if (stime.getHours() < 12) { ampm = "am"; }
-
-                    st = hours + ":" + min + " " + ampm
+					st = formatTime(stime);
                     newStop.innerText = myPage.trips[index].stops[stop].name + ", scheduled for: " + st;
 
                     stopList.appendChild(newStop);
                 }
             }
         }
+
+		function formatTime(t) {
+            min = t.getMinutes()
+            if (min < 10) {
+                min = "0" + min
+            }
+
+            hours = t.getHours() % 12
+
+            var ampm = "pm";
+            if (t.getHours() < 12) { ampm = "am"; }
+
+            return hours + ":" + min + " " + ampm
+		}
 
         function getTrack(trip) {
             for (var i=1; i<departures_data.query.results.row.length; i++) {
@@ -163,6 +185,22 @@
             }
             return "";
         }
+
+		function getDepartureTime(trip) {
+			// Check departure board for the time
+            for (var i=1; i<departures_data.query.results.row.length; i++) {
+                if (departures_data.query.results.row[i].col2 == trip) {
+                    return new Date(departures_data.query.results.row[i].col0 * 1000);
+                }
+            }
+
+			// Not on departure board at North Station or South Station, so instead, check the first stop time
+			//if (myPage.trips[trip].stops.length > 0)
+			//	return myPage.trips[trip].stops[0].scheduled;
+
+			// couldn't find it anywhere
+            return "";
+		}
 
     </script>
 
@@ -197,6 +235,7 @@
 
 				// setup jsonp yahoo bouncer for departure board feed
 				var script2 = document.createElement("script");
+				// http://developer.mbta.com/lib/gtrtfs/Departures.csv
 				script2.src = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%22http%3A%2F%2fdeveloper.mbta.com%2Flib%2Fgtrtfs%2FDepartures.csv%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=grab_departureboard';
 				document.getElementById("jsonp_script_parent").appendChild(script2);
           }
