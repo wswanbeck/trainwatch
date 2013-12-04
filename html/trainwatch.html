@@ -64,6 +64,7 @@
         var departures_data = null;
 		var myPage = new Object();
         myPage.trips = {};
+		var filterTrip = -1;
 
         // triggered when we have jsonp with schedule data
         function grab_schedule(response) {
@@ -77,7 +78,25 @@
             format_page();
         }
 
+		function setFilterTrip(nFilterTrip) {
+			filterTrip = nFilterTrip;
+			if (filterTrip == -1) {
+				// disable all trips button
+				document.getElementById('allTripsButton').disabled=true;
+			}
+			else {
+				// enable all trips button 
+				document.getElementById('allTripsButton').disabled=false;
+			}
+		}
+
+		function format_page_filtertrip(nfiltertrip) {
+			setFilterTrip(nfiltertrip);
+			format_page();
+		}
+
         // format the page with all the nice data we've gathered
+		// if filtertrip == -1, show all trips.  Otherwise only that particular trip
         function format_page() {
 
             // run this only after both departures_data and schedule_data has been received
@@ -112,6 +131,12 @@
             for (var index in myPage.trips) {
                 //console.debug("trip: " + index + " " + myPage.trips[index].destination);
 
+				// filter to only trip == filtertrip if requested
+				if ((filterTrip != -1) && (filterTrip != index)) {
+					// swip this trip
+					continue;
+				}
+
                 var newTrip = document.createElement("div");
                 id = "trip_" + index;
                 newTrip.setAttribute("id", id);
@@ -140,7 +165,7 @@
 
                 tripnumber = document.createElement("span");
                 tripnumber.setAttribute("class", "tripnumber");
-				tripnumber.setAttribute("onClick", "filterByTrip('" + index.toString() + "')");
+				tripnumber.setAttribute("onClick", "format_page_filtertrip(" + index.toString() + ")");
                 tripnumber.innerText =  "Trip #" + index;
                 newTripTitle.appendChild(tripnumber);
 
@@ -176,9 +201,6 @@
             }
         }
 
-		function filterByTrip(trip) {
-			// alert(trip);
-		}
 
 		function formatTime(t) {
             min = t.getMinutes()
@@ -235,12 +257,13 @@
     <div>
         <h1>MBTA Commuter Rail</h1>
 
-		<select id="select_line" onchange="setLine();">
+		<select id="select_line" onchange="setFilterTrip(-1);setLine();">
 		  <option value="lowell">Lowell</option>
 		  <option value="fitchburg">Fitchburg</option>
 		  <option value="stoughton">Stoughton</option>
 		</select>
 		
+		<button id="allTripsButton" disabled="true" onclick="format_page_filtertrip(-1)">All Trips</button>
 		<button onclick="setLine()">Refresh</button>
 		
         <div id="trips">
