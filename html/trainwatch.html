@@ -101,12 +101,14 @@
 
         // triggered when we have jsonp with schedule data
         function grab_schedule(response) {
+			document.getElementById('requesting-line-data').style.visibility = 'hidden';
             schedule_data = response;
             format_page();
         }
 
         // triggered when departureboard data received
         function grab_departureboard(response) {
+			document.getElementById('requesting-departure-data').style.visibility = 'hidden';
             departures_data = response;
             format_page();
         }
@@ -275,7 +277,36 @@
 		}
 
     </script>
-
+    <style type="text/css">
+		#progress div {
+			float:left;
+			margin: .5em;
+		}
+		
+		#requesting-line-data {
+			background-color: blue;
+			visibility:hidden;
+		}
+		
+		#requesting-departure-data {
+			background-color: purple;
+			visibility:hidden;
+		}
+		
+		#processing-data {
+			background-color: yellow;
+			visibility:hidden;
+		}
+		
+		#ready {
+			background-color: green;
+			visibility:visible;
+		}
+		
+		.trip {
+			clear: left;
+		}
+	</style>
 </head>
 
 <body>
@@ -298,6 +329,12 @@
 		
 		<button id="allTripsButton" disabled="true" onclick="format_page_filtertrip(-1)">All Trips</button>
 		<button onclick="setLine()">Refresh</button>
+		<div id="progress">
+			<div id="requesting-line-data">requesting line data</div>
+			<div id="requesting-departure-data">requesting departure data</div>
+			<div id="processing-data">processing data</div>
+			<div id="ready">ready</div>
+		</div>
 		
         <div id="trips">
 
@@ -316,7 +353,12 @@
 				
 				// choose which line (Lowell, Fitchburg etc.)
 				setLine();
-
+				
+				// start progress
+				document.getElementById('requesting-departure-data').style.visibility = 'visible';
+				
+				// start getting the data
+					
 				// setup jsonp yahoo bouncer for departure board feed
 				var script2 = document.createElement("script");
 				// http://developer.mbta.com/lib/gtrtfs/Departures.csv
@@ -343,6 +385,10 @@
 			
 			jsonp_script_parent_element = document.getElementById("jsonp_script_parent")
 			jsonp_script_parent_element.innerHTML = '';
+			
+			// progress bar starts 
+			document.getElementById('requesting-line-data').style.visibility = 'visible';
+			
 			jsonp_script_parent_element.appendChild(script);
 			
 		}
