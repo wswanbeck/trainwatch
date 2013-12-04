@@ -13,7 +13,10 @@
         }
 
 		.departuretime {
-			display: none;
+			margin-left: .4em;
+			font-weight: normal;
+			
+			/* display: none; */
 		}
 		
 		.trip {
@@ -166,7 +169,7 @@
 				if (departure_time != "") {
 					dep_time_element = document.createElement("span");
 					dep_time_element.setAttribute("class", "departuretime");
-					dep_time_element.innerText = formatTime(departure_time) + " to ";
+					dep_time_element.innerText = formatTime(departure_time) + " to";
 					newTripTitle.appendChild(dep_time_element);
 				} 
 
@@ -246,7 +249,7 @@
 			// Check departure board for the time
             for (var i=1; i<departures_data.query.results.row.length; i++) {
                 if (departures_data.query.results.row[i].col2 == trip) {
-                    return new Date(departures_data.query.results.row[i].col0 * 1000);
+                    return new Date(departures_data.query.results.row[i].col4 * 1000);
                 }
             }
 
